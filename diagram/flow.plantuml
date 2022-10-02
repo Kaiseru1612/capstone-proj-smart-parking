@@ -1,0 +1,56 @@
+@startuml test
+partition App {
+(*) --> "User login"
+--> ===BEFORE_CHOOSE_PARKING_LOT===
+--> "Get status parking spaces"
+--> ===BEFORE_CONFIRM===
+
+===BEFORE_CHOOSE_PARKING_LOT=== --> "User search parking lot"
+--> ===BEFORE_CONFIRM===
+--> "User view parking lot"
+--> "User select parking lot"
+    note top
+        - Find efficient path
+    end note
+if "Register success?"then
+    -->[True] "Update lot status"
+else
+    -->[False]===BEFORE_CHOOSE_PARKING_LOT===
+endif
+"Update lot status"--> ===WAIT_FOR_CAR===
+}
+
+partition Observer_Node {
+    ===WAIT_FOR_CAR===-->"Wait for car"
+    --> "Check license plate"
+        note right
+            - Read liciense plate
+            - Check car move in or out
+        end note
+    if "Is car drive in?" then
+        -->[True] "User checkin"
+            if "In booking list?" then
+                -->[True] "Wait for car to park"
+                    if "Park correctly?" then
+                    note left
+                    - Detect parking area
+                    - Detect car
+                    end note
+                        -->[True]"Update parking lot status"
+                    else
+                        -right->[False] "Alert security guard"
+                    endif
+            else
+                -->[False] "Alert security guard"
+            endif
+    else
+        -->[False] "User checkout"
+    endif
+    --> "Update parking lot status"
+        note right
+            - Check occupation
+        end note
+}
+
+-->(*)
+@enduml
