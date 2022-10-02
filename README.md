@@ -1,10 +1,10 @@
-# _{Smart Parking System (SPARK)}_
+# _Smart Parking System_
 
 #### _{Brief description of application}_
 
 #### By _**{List of contributors}**_
-Tran Vinh Tien
-Nguyen Thanh Loc
+* _Tran Vinh Tien_
+* _Nguyen Thanh Loc_
 ## Technologies Used
 
 * _List all_
