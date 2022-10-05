@@ -7,6 +7,12 @@ Tran Vinh Tien
 Nguyen Thanh Loc
 ## Technologies Used
 
+
+* [![python][Next.js]][Next-url]
+* [![React][React.js]][React-url]
+* [![Bootstrap][Bootstrap.com]][Bootstrap-url]
+* [![JQuery][JQuery.com]][JQuery-url]
+
 * _List all_
 * _the major technologies_
 * _you used in your project_
@@ -30,10 +36,6 @@ _{Leave nothing to chance! You want it to be easy for potential users, employers
 
 * _Any known issues_
 * _should go here_
-
-## License
-
-_{Let people know what to do if they run into any issues or have questions, ideas or concerns.  Encourage them to contact you or make a contribution to the code.}_
 
 ## Contact Information
 

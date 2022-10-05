@@ -1,6 +1,11 @@
 @startuml test
 partition App {
-(*) --> "User login"
+(*) --> "Open app"
+if "have account?" then
+    -->[True] "User login"
+    --> ===BEFORE_CHOOSE_PARKING_LOT===
+ else
+    -->[False] "Register"
 --> ===BEFORE_CHOOSE_PARKING_LOT===
 --> "Get status parking spaces"
 --> ===BEFORE_CONFIRM===
@@ -20,29 +25,62 @@ endif
 "Update lot status"--> ===WAIT_FOR_CAR===
 }
 
+' check license plate?
+
 partition Observer_Node {
     ===WAIT_FOR_CAR===-->"Wait for car"
     --> "Check license plate"
-        note right
-            - Read liciense plate
-            - Check car move in or out
+    if "Number of car increase?" then
+        --> "update number current in lot(1)"
+        note left
+        3 case from here
+        (1) Check-in
+        (2) Check-out
+        (3) Nothing
         end note
-    if "Is car drive in?" then
         -->[True] "User checkin"
-            if "In booking list?" then
-                -->[True] "Wait for car to park"
-                    if "Park correctly?" then
-                    note left
-                    - Detect parking area
-                    - Detect car
-                    end note
-                        -->[True]"Update parking lot status"
-                    else
-                        -right->[False] "Alert security guard"
-                    endif
+        --> ===BEFORE_PARKING===
+        --> "Wait for car to park (3 minutes?)"
+        note left
+            May take longer than expected
+            Car may move in while wait
+        end note
+        --> "Confirm/Check in on mobile app"
+        note left
+            User may not check in
+        end note
+        --> ===AFTER_PARKING===
+        -->"Get latest payload from mqtt channel checkin (retained message?)"
+        if "check in message not zero?" then
+            note left
+                ?
+            end note
+            -->[True] "Set status as 'CHECK-IN' on server"
+            -->"Send to channel ParkingLotID/car_number/prevoius_value_+1"
+            --> "Check car number(2)"
+            -->"Compare number of car current with check-in request" 
+            if "car_increase == number_check_in?" then
+                -->[True] "Get latest payload from mqtt channel checkin (retained message?) (case1)"
+                -->"Send to channel ParkingLotID/car_number/prevoius_value_-1(case1)"
+                -->"Update parking lot status"
             else
-                -->[False] "Alert security guard"
+                if "car_increase > number_check_in" then
+                    -->[True] "Get latest payload from mqtt channel checkin (retained message?)(case2)"
+                    -->"Send to channel ParkingLotID/car_number/prevoius_value_-1(case2)"
+                    -->"Update parking lot status(case2)"
+                    --> "Check car number(2)"
+                else
+                    -->[False] "dunno"
+                    note left
+                    - So luong xe trong bai giam?
+                    - check out nhieu hon check in
+                    end note
+                endif
             endif
+        else
+            -->[False] "Alert security guard"
+            -->===END===
+        endif
     else
         -->[False] "User checkout"
     endif
@@ -50,7 +88,30 @@ partition Observer_Node {
         note right
             - Check occupation
         end note
+    --> ===END===
+
+    ===BEFORE_PARKING== --> "Check car number(1)"
+    if "Car number increase?" then
+        -->[True] "Update number current in lot(2)"
+        --> "Increase waiting time"
+        --> ===BEFORE_PARKING===
+    else
+        if "Timeout or receive check-in message?" then
+            -->[True]===AFTER_PARKING===
+        else
+            -->[False] "Check car number(1)"
+    endif
 }
 
--->(*)
+partition Ambigous{
+    "dunno"--> ===END===
+}
+
+partition Server{
+    
+}
+
+
+
+===END===-->(*)
 @enduml
