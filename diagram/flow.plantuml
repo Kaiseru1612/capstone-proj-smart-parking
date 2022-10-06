@@ -29,16 +29,10 @@ endif
 
 partition Observer_Node {
     ===WAIT_FOR_CAR===-->"Wait for car"
-    --> "Check license plate"
+    ' --> "Check license plate"
     if "Number of car increase?" then
-        --> "update number current in lot(1)"
-        note left
-        3 case from here
-        (1) Check-in
-        (2) Check-out
-        (3) Nothing
-        end note
         -->[True] "User checkin"
+        --> "Update number current in lot(1)"
         --> ===BEFORE_PARKING===
         --> "Wait for car to park (3 minutes?)"
         note left
@@ -72,8 +66,8 @@ partition Observer_Node {
                 else
                     -->[False] "dunno"
                     note left
-                    - So luong xe trong bai giam?
-                    - check out nhieu hon check in
+                    - Number of car decrease?
+                    - check out more than check in
                     end note
                 endif
             endif
